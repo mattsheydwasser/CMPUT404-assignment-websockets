@@ -136,7 +136,9 @@ function addEntity(entity, data) {
     world[entity] = data;
     drawNextFrame(); // (but should we?)
     //XXX: Send a XHTML Request that updates the entity you just modified!
-    socket.send(JSON.stringify(world))
+    
+    console.log("sending from client: "+ JSON.stringify({"entity":entity,"data":data}))
+    socket.send(JSON.stringify({"entity":entity,"data":data}))
     
 }
 var counter = 0;
@@ -279,6 +281,9 @@ mouse.mousedraggers.push(
 
 
 function update() {
+
+    socket.send("get world")
+    drawNextFrame();
     drawFrame();
     
 }
@@ -299,7 +304,9 @@ function wsSetup() {
         try {
             debug("WebSocket Recv:" + msg.data);
             //XXX: TODO What are you going to do here?
-            console.log("Message: " + msg.data)
+            console.log("Message recieved on client: " + msg.data)
+            world = msg.data
+            update()
         } catch (e) {
             alert("socket on message: " + e);
         }

@@ -63,7 +63,7 @@ myWorld = World()
 
 def set_listener( entity, data ):
     ''' do something with the update ! '''
-    myWorld.set(entity, data)
+    print(f"Updating entity {entity} with {data}")
 
 myWorld.add_set_listener( set_listener )
         
@@ -80,18 +80,25 @@ def read_ws(ws,client):
         myWorld.world = json.loads(message)
         
     
-
+clients = []
 @sockets.route('/subscribe')
 def subscribe_socket(ws):
     '''Fufill the websocket URL of /subscribe, every update notify the
        websocket and read updates from the websocket '''
-       
+    clients.append(ws)
     while not ws.closed:
         
         message = ws.receive()
-        if (message is not None):
-            myWorld.world = json.loads(message)
-        ws.send("Received")
+        if message == "get world":
+            print("ayayay")
+        else: 
+            print("received on server: ",message)
+            mes = json.loads(message)
+            myWorld.set(mes["entity"], mes["data"])
+            
+            for each in clients:
+                each.send(json.dumps(myWorld.world()))
+        
         
 
 
