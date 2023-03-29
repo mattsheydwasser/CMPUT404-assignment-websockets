@@ -74,10 +74,17 @@ def hello():
 
 def read_ws(ws,client):
     '''A greenlet function that reads from the websocket and updates the world'''
-    message = ws.recieve()
-        
-    if (message is not None):
-        myWorld.world = json.loads(message)
+   
+    # read message from websocket, send world or update it first then send the new world
+    message = ws.receive()
+    if message == "get world":
+        client.send(json.dumps(myWorld.world()))
+    else:
+        data = json.loads(message)
+        myWorld.set(data["entity"], data["data"])
+        client.send(json.dumps(myWorld.world()))
+
+    
         
     
 clients = []
@@ -85,21 +92,14 @@ clients = []
 def subscribe_socket(ws):
     '''Fufill the websocket URL of /subscribe, every update notify the
        websocket and read updates from the websocket '''
+    
+    # add client to list, for each call read_ws
     clients.append(ws)
     while not ws.closed:
-        
-        message = ws.receive()
-        if message == "get world":
-            print("ayayay")
-        else: 
-            print("received on server: ",message)
-            mes = json.loads(message)
-            myWorld.set(mes["entity"], mes["data"])
-            
-            for each in clients:
-                each.send(json.dumps(myWorld.world()))
-        
-        
+        for each in clients:
+            read_ws(ws, each)
+         
+
 
 
 # I give this to you, this is how you get the raw body/data portion of a post in flask
