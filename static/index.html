@@ -293,8 +293,7 @@ function wsSetup() {
 
         // If there is an error message, close the connection
         debug("WebSocket Error:" + msg.data);
-        socket.close("Good Bye Server")
-        console.log("Connection Closed")
+        
     };
     socket.onmessage = function(msg) {  
         try {
