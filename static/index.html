@@ -135,8 +135,8 @@ function addEntity(entity, data) {
     drawNextFrame(); 
 
     // Send new entity to server
-    console.log("Sending from client: "+ JSON.stringify({"entity":entity,"data":data}))
-    socket.send(JSON.stringify({"entity":entity,"data":data}))
+    // console.log("Sending from client: "+ JSON.stringify({"entity":entity,"data":data}))
+    socket.send(JSON.stringify(world))
     
 }
 var counter = 0;
@@ -286,7 +286,7 @@ function wsSetup() {
     socket.onopen = function() {
 
         // on socket open, get the current world state
-        socket.send("get world")
+        socket.send()
         console.log("Connection Opened")
     };
     socket.onerror = function(msg) {
@@ -297,10 +297,11 @@ function wsSetup() {
     };
     socket.onmessage = function(msg) {  
         try {
-            debug("WebSocket Recv: World " + typeof(JSON.parse(msg.data)));
+            debug("WebSocket Recv: " + JSON.parse(msg.data));
             
             // set the world from the server, update the drawing
             world = JSON.parse(msg.data)
+            console.log("RECV: " + JSON.parse(msg.data))
             update()
         } catch (e) {
             alert("socket on message: " + e);
